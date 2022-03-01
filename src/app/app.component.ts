@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Cocktail } from './interface/cocktail.interface';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +7,5 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'coktails';
+  
 }
