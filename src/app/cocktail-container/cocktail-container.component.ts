@@ -2,12 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { Cocktail } from '../interface/cocktail.interface';
 
 @Component({
-  selector: 'app-cocktail-list',
-  templateUrl: './cocktail-list.component.html',
-  styleUrls: ['./cocktail-list.component.scss']
+  selector: 'app-cocktail-container',
+  templateUrl: './cocktail-container.component.html',
+  styleUrls: ['./cocktail-container.component.scss']
 })
-export class CocktailListComponent implements OnInit {
-  cocktails : Cocktail[] = [
+export class CocktailContainerComponent implements OnInit {
+  public cocktails : Cocktail[] = [
     {
       name: 'Morito',
       img:'https://www.hangoverweekends.co.uk/media/15505/mojito.jpg?width=500&height=375',
@@ -24,9 +24,16 @@ export class CocktailListComponent implements OnInit {
       description: 'The concoction of Bourbon, a little bit of water, powdered and granulated sugar and plenty of mint has long been a very popular way to drink a cocktail. Simple yet refined.'
     }
   ];
+
+  public selectedCocktail: Cocktail = this.cocktails[0];
+
   constructor() { }
 
   ngOnInit(): void {
+  }
+
+  public selectCocktail(index: number): void {
+    this.selectedCocktail = this.cocktails[index];
   }
 
 }
