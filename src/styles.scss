@@ -13,6 +13,19 @@ a {
     text-decoration: none;
     color: var(--text-regular);
 }
+input {
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    padding: 8px 15px;
+}
+hr {
+    margin: 20px 0;
+    border-top: 1px solid #ddd;
+}
+button:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
 :root {
     --font-family:'Roboto', sans-serif;
     --primary:#546de5;
@@ -124,6 +137,9 @@ body {
             background-color: var(--secondary);
         }
         transition: all 0.4s
+    }
+    &-secondary {
+        background: #ddd;
     }
 }
 .badge {
