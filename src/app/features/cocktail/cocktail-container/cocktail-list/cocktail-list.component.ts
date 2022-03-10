@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { Cocktail } from '../../shared/interface/cocktail.interface';
+import { Cocktail } from '../../../../shared/interface/cocktail.interface';
 
 @Component({
   selector: 'app-cocktail-list',
@@ -8,6 +8,8 @@ import { Cocktail } from '../../shared/interface/cocktail.interface';
 })
 export class CocktailListComponent implements OnInit {
   @Input() public cocktails!: Cocktail[];
+  public search = '';
+  
   constructor() { }
  
   ngOnInit(): void {
