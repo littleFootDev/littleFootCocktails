@@ -1,8 +1,10 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 
 
+import { SharedModule } from 'src/app/shared/modules/shared.module';
 
 //Component
 
@@ -11,6 +13,7 @@ import { CocktailListComponent } from './cocktail-container/cocktail-list/cockta
 import { CocktailDetailsComponent } from './cocktail-container/cocktail-details/cocktail-details.component';
 import { CocktailContainerComponent } from './cocktail-container/cocktail-container.component';
 import { CocktailFormComponent } from './cocktail-container/cocktail-form/cocktail-form.component';
+import { cocktailRouting } from './cocktail.route';
 
 
 
@@ -24,9 +27,11 @@ import { CocktailFormComponent } from './cocktail-container/cocktail-form/cockta
   
   ],
   imports: [
-    CommonModule,
+    SharedModule,
     ReactiveFormsModule,
-    FormsModule
+    FormsModule,
+    RouterModule,
+    cocktailRouting
   ]
 })
 export class CocktailModule { }

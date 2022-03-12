@@ -1,8 +1,9 @@
-import { Component,  OnDestroy,  OnInit } from '@angular/core';
-import { ActivatedRoute, ParamMap } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Component,  OnInit } from '@angular/core';
+import { ActivatedRoute, Params } from '@angular/router';
+
 import { CocktailService } from 'src/app/shared/services/cocktail.service';
 import { Cocktail } from '../../../../shared/interface/cocktail.interface';
+import {Ingredient } from '../../../../shared/interface/ingredient.interface'
 import {PanierService} from '../../../../shared/services/panier.service'
 
 @Component({
@@ -10,9 +11,9 @@ import {PanierService} from '../../../../shared/services/panier.service'
   templateUrl: './cocktail-details.component.html',
   styleUrls: ['./cocktail-details.component.scss']
 })
-export class CocktailDetailsComponent implements OnInit, OnDestroy {
+export class CocktailDetailsComponent implements OnInit {
   public cocktail! : Cocktail;
-  public subscription! : Subscription;
+  public index! : number;
   
 
   constructor(
@@ -22,19 +23,21 @@ export class CocktailDetailsComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    this.activatedRoute.paramMap.subscribe((paramMap : ParamMap) => {
-      if(this.subscription) {
-        this.subscription.unsubscribe();
+    this.activatedRoute.paramMap.subscribe((params : Params) => {
+      if(params['get']('index')) {
+        this.index = params['get']('index');
       }
-     this.subscription = this.cocktailService.getCocktail(+this.activatedRoute.snapshot.paramMap.get('index')!).subscribe((cocktail : Cocktail) => {
+     
+      this.cocktailService.getCocktail(this.index).subscribe((cocktail : Cocktail) => {
       this.cocktail = cocktail;
-    });
+      });
     })
+  };
+
+  public addToPanier (ingredients: Ingredient[]): void {
+    this.panierService.addIngredients(ingredients);
   }
-  public addToPanier (): void {
-    this.panierService.addToPanier(this.cocktail.ingredients);
-  }
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+  public getUrl() {
+    return['/cocktails', this.index, 'edit']
   }
 }

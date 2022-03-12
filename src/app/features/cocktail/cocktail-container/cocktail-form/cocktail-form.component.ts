@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { first } from 'rxjs';
+import { ActivatedRoute, Params } from '@angular/router';
 import { Cocktail } from '../../../../shared/interface/cocktail.interface';
 import { CocktailService } from '../../../../shared/services/cocktail.service';
 
@@ -11,8 +10,9 @@ import { CocktailService } from '../../../../shared/services/cocktail.service';
   styleUrls: ['./cocktail-form.component.scss']
 })
 export class CocktailFormComponent implements OnInit {
-  public cocktail?: Cocktail;
-  public cocktailForm: FormGroup = this.initForm();
+  public cocktail!: Cocktail;
+  public cocktailForm!: FormGroup;
+  public edit! : boolean;
 
   public get ingredients() {
     return this.cocktailForm.get('ingredients') as FormArray;
@@ -21,59 +21,54 @@ export class CocktailFormComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private cocktailService: CocktailService,
-    private router: Router,
     private activatedRoute: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
-    this.activatedRoute.paramMap.subscribe((paramMap: ParamMap) => {
-      const index = paramMap.get('index');
-      if (index !== null) {
-        this.cocktailService.getCocktail(+index).pipe(first()).subscribe((cocktail: Cocktail) => {
+    this.activatedRoute.paramMap.subscribe((params: Params) => {
+      if (params['get']('index')) {
+        this.edit = true;
+        this.cocktailService.getCocktail(params['get']('index')).subscribe((cocktail: Cocktail) =>{
           this.cocktail = cocktail;
-          this.initForm(this.cocktail);
+          this.initForm(this.cocktail)
         });
       } else {
+        this.edit = false;
         this.initForm();
       }
     });
   }
 
-  private initForm(
-    cocktail: Cocktail = { name: '', description: '', img: '', ingredients: [] }
-  ): FormGroup {
-    return this.fb.group({
+  initForm(cocktail = { name: '', image: '', description: '', ingredients: [] }) {
+    this.cocktailForm = this.fb.group({
       name: [cocktail.name, Validators.required],
-      img: [cocktail.img, Validators.required],
-      description: [cocktail.description, Validators.required],
+      image: [cocktail.image, Validators.required],
+      description: [cocktail.description],
       ingredients: this.fb.array(
-        cocktail.ingredients.map(ingredient =>
+        cocktail.ingredients.map((ingredient) =>
           this.fb.group({
-            name: [ingredient.name, Validators.required],
-            quantity: [ingredient.quantity, Validators.required]
+            name: [ingredient.name],
+            quantity: [ingredient.quantity],
           })
-        ),
-        Validators.required
-      )
+        )
+      ),
     });
   }
 
   public addIngredient(): void {
     this.ingredients.push(
       this.fb.group({
-        name: ['', Validators.required],
-        quantity: [0, Validators.required]
+        name: ['',],
+        quantity: [0,]
       })
     );
   }
 
-  public submit(): void {
-    if (this.cocktail) {
-      this.cocktailService
-        .editCocktail(this.cocktail._id, this.cocktailForm.value)
-        .subscribe();
+  public createCcocktail(): void {
+    if(this.edit) {
+      this.cocktailService.editCocktail(this.cocktailForm.value);
     } else {
-      this.cocktailService.addCocktail(this.cocktailForm.value).subscribe();
+      this.cocktailService.addCocktail(this.cocktailForm.value)
     }
-    this.router.navigate([".."], { relativeTo: this.activatedRoute });
-  }_
+  }
+}
