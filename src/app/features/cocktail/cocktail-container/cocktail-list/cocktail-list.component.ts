@@ -7,7 +7,7 @@ import { Cocktail } from '../../../../shared/interface/cocktail.interface';
   styleUrls: ['./cocktail-list.component.scss']
 })
 export class CocktailListComponent implements OnInit {
-  @Input() public cocktails: Cocktail[] | null = null;
+  @Input() public cocktails!: Cocktail[];
   public search = '';
   
   constructor() { }
@@ -15,7 +15,4 @@ export class CocktailListComponent implements OnInit {
   ngOnInit(): void {
   }
   
-  public selectCocktail(index: number): void {
-  }
-
 }

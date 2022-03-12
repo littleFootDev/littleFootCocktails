@@ -1,43 +1,43 @@
-import { Component,  OnInit } from '@angular/core';
-import { ActivatedRoute, Params } from '@angular/router';
-
-import { CocktailService } from 'src/app/shared/services/cocktail.service';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute, ParamMap } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { Cocktail } from '../../../../shared/interface/cocktail.interface';
-import {Ingredient } from '../../../../shared/interface/ingredient.interface'
-import {PanierService} from '../../../../shared/services/panier.service'
+import { CocktailService } from '../../../../shared/services/cocktail.service';
+import { PanierService } from '../../../../shared/services/panier.service';
 
 @Component({
   selector: 'app-cocktail-details',
   templateUrl: './cocktail-details.component.html',
-  styleUrls: ['./cocktail-details.component.scss']
+  styleUrls: ['./cocktail-details.component.scss'],
 })
-export class CocktailDetailsComponent implements OnInit {
-  public cocktail! : Cocktail;
-  public index! : number;
-  
+export class CocktailDetailsComponent implements OnInit, OnDestroy {
+  public cocktail!: Cocktail;
+  public subscription!: Subscription;
 
   constructor(
     private panierService: PanierService,
     private cocktailService: CocktailService,
-    private activatedRoute : ActivatedRoute
-  ) { }
+    private activatedRoute: ActivatedRoute
+  ) {}
 
   ngOnInit(): void {
-    this.activatedRoute.paramMap.subscribe((params : Params) => {
-      if(params['get']('index')) {
-        this.index = params['get']('index');
+    this.activatedRoute.paramMap.subscribe((paramMap: ParamMap) => {
+      if (this.subscription) {
+        this.subscription.unsubscribe();
       }
-     
-      this.cocktailService.getCocktail(this.index).subscribe((cocktail : Cocktail) => {
-      this.cocktail = cocktail;
-      });
-    })
-  };
-
-  public addToPanier (ingredients: Ingredient[]): void {
-    this.panierService.addIngredients(ingredients);
+      this.subscription = this.cocktailService
+        .getCocktail(+paramMap.get('index'))
+        .subscribe((cocktail: Cocktail) => {
+          this.cocktail = cocktail;
+        });
+    });
   }
-  public getUrl() {
-    return['/cocktails', this.index, 'edit']
+
+  public addToPanier(): void {
+    this.panierService.addToPanier(this.cocktail.ingredients);
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 }

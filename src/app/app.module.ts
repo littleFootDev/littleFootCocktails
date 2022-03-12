@@ -1,29 +1,24 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import {HttpClientModule } from '@angular/common/http';
+import { RouterModule } from '@angular/router';
+import { HttpClientModule } from '@angular/common/http';
+
 
 import { AppComponent } from './app.component';
-import { PanierService } from './shared/services/panier.service';
-import { CocktailModule } from './features/cocktail/cocktail.module';
-import { SharedModule } from './shared/modules/shared.module';
-import { AppRouting } from './app.routes';
+import { HeaderComponent } from './header/header.component';
+
+
+import { APP_ROUTES } from './app.routes';
 
 @NgModule({
   declarations: [
-    AppComponent,
-
-  ],
+    AppComponent, 
+    HeaderComponent],
   imports: [
-    BrowserModule,
-    HttpClientModule,
-    FormsModule,
-    CocktailModule,
-    SharedModule,
-    AppRouting,
-   
-  ],
-  providers: [PanierService],
-  bootstrap: [AppComponent]
+    BrowserModule, 
+    HttpClientModule, 
+    RouterModule.forRoot(APP_ROUTES)],
+  providers: [],
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

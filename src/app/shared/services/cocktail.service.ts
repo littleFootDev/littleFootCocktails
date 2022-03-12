@@ -1,58 +1,140 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import {filter, map } from 'rxjs/operators';
+import { filter, map, tap } from 'rxjs/operators';
 import { Cocktail } from '../interface/cocktail.interface';
-import { Ingredient } from '../interface/ingredient.interface';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class CocktailService {
-  public cocktails$: BehaviorSubject<Cocktail[] | []> = new BehaviorSubject<Cocktail[] | []>([]);
+  public cocktails$: BehaviorSubject<Cocktail[] | []> = new BehaviorSubject<
+    Cocktail[] | []
+  >([]);
 
-  constructor(private http: HttpClient) {
-    this.cocktailsInit();
-  }
+  constructor(private http: HttpClient) {}
 
-  cocktailsInit(): void {
-    this.http
-      .get('https://cocktails-63318.firebaseio.com/cocktails.json')
-      .subscribe((cocktails: Cocktail[]) => {
-        this.cocktails$.next(cocktails);
-      });
-  }
-
-  getCocktail(index: number): Observable<Cocktail> {
+  public getCocktail(index: number): Observable<Cocktail> {
     return this.cocktails$.pipe(
-      filter((cocktails) => cocktails != null),
-      map((cocktails) => cocktails[index])
+      filter((cocktails: Cocktail[]) => cocktails !== null),
+      map((cocktails: Cocktail[]) => {
+        return cocktails[index];
+      })
     );
   }
 
-  addCocktail(cocktail: Cocktail) {
-    const cocktails = this.cocktails$.value;
-    cocktails.push({
-      name: cocktail.name,
-      imgage: cocktail.imgage,
-      description: cocktail.description,
-      ingredients: cocktail.ingredients,
-    });
-    this.cocktails$.next(cocktails);
+  public addCocktail(cocktail: Cocktail) {
+    return this.http
+      .post<Cocktail>('https://restapi.fr/api/cocktails', cocktail)
+      .pipe(
+        tap((savedCocktail: Cocktail) => {
+          const value = this.cocktails$.value;
+          this.cocktails$.next([...value, savedCocktail]);
+        })
+      );
   }
 
-  editCocktail(editCocktail: Cocktail): void {
-    const cocktails = this.cocktails$.value.slice();
-    const index = cocktails.map((c) => c.name).indexOf(editCocktail.name);
-    cocktails[index] = editCocktail;
-    this.cocktails$.next(cocktails);
-    this.save();
-  }
-
-  save(): void {
-    this.http
-      .put(
-        'https://cocktails-63318.firebaseio.com/cocktails.json',
-        this.cocktails$.value
+  public editCocktail(
+    cocktailId: string,
+    editedCocktail: Cocktail
+  ): Observable<Cocktail> {
+    return this.http
+      .patch<Cocktail>(
+        `https://restapi.fr/api/cocktails/${cocktailId}`,
+        editedCocktail
       )
-      .subscribe((res) => console.log(res));
+      .pipe(
+        tap((savedCocktail: Cocktail) => {
+          const value = this.cocktails$.value;
+          this.cocktails$.next(
+            value.map((cocktail: Cocktail) => {
+              if (cocktail.name === savedCocktail.name) {
+                return savedCocktail;
+              } else {
+                return cocktail;
+              }
+            })
+          );
+        })
+      );
+  }
+
+  public fetchCocktails(): Observable<Cocktail[]> {
+    return this.http.get('https://restapi.fr/api/cocktails').pipe(
+      tap((cocktails: Cocktail[]) => {
+        this.cocktails$.next(cocktails);
+      })
+    );
+  }
+
+  public seed() {
+    this.http
+      .post('https://restapi.fr/api/cocktails', {
+        name: 'Mojito',
+        img: 'https://www.hangoverweekends.co.uk/media/15505/mojito.jpg?width=500&height=375',
+        description:
+          'The Mojito complimenting summer perfectly with a fresh minty taste. The mixture of white rum, mint, lime juice, sugar and soda water is crisp and clean with a relatively low alcohol content, the soda water can be replaced with sprite or 7-up. When preparing a mojito always crush the mint leaves as opposed to dicing to unlock oils that will assist with enhancing the minty flavour.',
+        ingredients: [
+          {
+            name: 'Menthe',
+            quantity: 2,
+          },
+          {
+            name: 'Perrier',
+            quantity: 1,
+          },
+          {
+            name: 'Rhum',
+            quantity: 3,
+          },
+        ],
+      })
+      .subscribe();
+
+    this.http
+      .post('https://restapi.fr/api/cocktails', {
+        name: 'Cosmopolitan',
+        img: 'https://www.hangoverweekends.co.uk/media/15507/gallery-1430408520-dmg-cosmopolitan-cocktail-001.jpg?width=330px&height=407px',
+        description:
+          'The tangy concoction of vodka, triple sec, lime juice and cranberry juice has managed to leapfrog the venerable screwdriver as many vodka drinkers prefer the Cosmopolitan’s cleaner and slightly tart taste. The keys to the preparation of a Cosmopolitan are a good brand of cranberry juice and Cointreau Triple Sec, two essential elements to the drink.',
+        ingredients: [
+          {
+            name: 'Cranberry',
+            quantity: 1,
+          },
+          {
+            name: 'Citron',
+            quantity: 2,
+          },
+          {
+            name: 'Vodka',
+            quantity: 1,
+          },
+        ],
+      })
+      .subscribe();
+
+    this.http
+      .post('https://restapi.fr/api/cocktails', {
+        name: 'Mai Tai',
+        img: 'https://www.hangoverweekends.co.uk/media/15506/mm-cocktail-guide-maitai-590x375.jpg?width=434px&height=276px',
+        description:
+          'The Mai Tai is a Polynesian-style cocktail that has a fruity tropical taste sweet and vibrant. The mixture of light and dark rum, orange curacao, orgeat syrup and lime juice has been a symbol of Tahitian culture ever since the drink was first created.',
+        ingredients: [
+          {
+            name: 'Rhum',
+            quantity: 1,
+          },
+          {
+            name: 'Citron',
+            quantity: 2,
+          },
+          {
+            name: 'Triple sec',
+            quantity: 1,
+          },
+        ],
+      })
+      .subscribe();
   }
 }
