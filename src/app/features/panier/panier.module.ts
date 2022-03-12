@@ -1,9 +1,12 @@
 import { NgModule } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { RouterModule } from "@angular/router";
+
 import { PannierContainerComponent } from "./pannier-container/pannier-container.component";
 import { IngredientListComponent } from "./pannier-container/ingredient-list/ingredient-list.component";
-import { RouterModule } from "@angular/router";
+
 import { PANIER_ROUTE } from "./PANIER_ROUTE";
-import { SharedModule } from "src/app/shared/modules/shared.module";
+
 
 
 @NgModule({
@@ -11,7 +14,8 @@ import { SharedModule } from "src/app/shared/modules/shared.module";
     PannierContainerComponent,
     IngredientListComponent],
   imports: [
-    SharedModule,
+    CommonModule,
+    
     RouterModule.forChild(PANIER_ROUTE)
   ]
 })

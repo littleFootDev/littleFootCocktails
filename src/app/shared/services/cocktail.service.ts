@@ -12,7 +12,9 @@ export class CocktailService {
     Cocktail[] | []
   >([]);
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    this.seed()
+  }
 
   public getCocktail(index: number): Observable<Cocktail> {
     return this.cocktails$.pipe(
@@ -60,7 +62,7 @@ export class CocktailService {
   }
 
   public fetchCocktails(): Observable<Cocktail[]> {
-    return this.http.get('https://restapi.fr/api/cocktails').pipe(
+    return this.http.get<Cocktail[]>('https://restapi.fr/api/cocktails').pipe(
       tap((cocktails: Cocktail[]) => {
         this.cocktails$.next(cocktails);
       })

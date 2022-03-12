@@ -9,6 +9,7 @@ import { Ingredient } from '../../../../shared/interface/ingredient.interface';
 export class IngredientListComponent implements OnInit {
 
   @Input() public ingredients: Ingredient[] | null = null;
+  
   constructor() { }
 
   ngOnInit(): void {
